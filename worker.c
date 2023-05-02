@@ -13,9 +13,11 @@
 #include <unistd.h>
 #include <netinet/tcp.h>
 
-#define BUFFER_SIZE 1024
+// #define PORT 3362
 #define PORT 3365
 
+
+#define BUFFER_SIZE 1024
 double perform_operation(const char *operation, double a, double b) {
     if (strcmp(operation, "add") == 0) {
         return a + b;
@@ -35,7 +37,8 @@ int main(int argc, char *argv[]) {
     struct sockaddr_in server_addr;
     //const char worker_hello[] = "worker";
 	const char* identifier = "2";
-	
+	printf("Worker: iniciado\n");
+
     if (argc < 2){
         printf("Usage: %s <ip address>\n", argv[0]);
         exit(0);
@@ -68,9 +71,7 @@ int main(int argc, char *argv[]) {
 
     char buffer[BUFFER_SIZE];
     while (1) {
-
         /* Receive request */
-        memset(buffer, 0, BUFFER_SIZE);
         if (recv(sockfd, buffer, BUFFER_SIZE, 0) < 0) {
             perror("Error receiving request");
             exit(EXIT_FAILURE);
@@ -86,10 +87,10 @@ int main(int argc, char *argv[]) {
         char operation[32];
         double a, b;
         sscanf(buffer, "%s %lf %lf", operation, &a, &b);
-        printf("Worker received request: %s %lf %lf\n", operation, a, b);
+        printf("Worker: received request: %s %lf %lf\n", operation, a, b);
         fflush(stdout);
         double result = perform_operation(operation, a, b);
-
+        // printf("Result = %.21f\n",result);
         /* Send the result back to the server */
         snprintf(buffer, BUFFER_SIZE, "%.2lf", result);
         if (send(sockfd, buffer, strlen(buffer) + 1, 0) < 0) {
@@ -97,6 +98,9 @@ int main(int argc, char *argv[]) {
             exit(EXIT_FAILURE);
         }
     }
+    const char* msg = "leave\0";
+    send(sockfd, msg, strlen(msg), 0);
+
 
     /* Close the socket */
     close(sockfd);
