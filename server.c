@@ -98,9 +98,9 @@ float isAliveWorker(void* wd){
 		while(worker->socket){
 			printf("Server: Info workers: Socket - %x | Address - %d | Idle - %d\n", worker->socket, worker->worker_addr, worker->identifier);
 			sleep(10);
-			if((n = recv(worker->socket, recvBuffer, sizeof(recvBuffer)-1, 0))>0){
-				break;
-			}
+			// if((n = recv(worker->socket, recvBuffer, sizeof(recvBuffer)-1, 0))>0){
+			// 	break;
+			// }
 		}
 	}else{
 		printf("Server: Max Worker Over Capacity!!");
@@ -141,9 +141,10 @@ void *clientHandle(void* cd){
 		else break;
 	}
 	printf("Thread: Buffer msg: %s\n", recvBuffer);
-	sleep(3);
+	// sleep(1);
 	
 	if ( (sem = sem_trywait(&workers_busy)) >= 0){
+		// sleep(1);
 		printf("Thread: Idle Worker! Go to work!\n");
 		w = verifyIdleWorker();
 		printf("Thread: Worker selected: %d\n",w);
